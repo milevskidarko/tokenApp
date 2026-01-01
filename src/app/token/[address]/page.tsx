@@ -1,11 +1,14 @@
+"use client";
+import { useParams } from "next/navigation";
 import TokenPageClient from "../../../components/TokenPageClient";
 
-interface TokenPageProps {
-    params: { address: string };
-}
+export default function TokenPage() {
+    const params = useParams();
+    const address = typeof params.address === "string" ? params.address : params.address?.[0];
 
-export default async function TokenPage({ params }: TokenPageProps) {
-    const resolvedParams = await params;
-    return <TokenPageClient address={resolvedParams.address} />;
-}
+    if (!address) {
+        return <div>Invalid token address.</div>;
+    }
 
+    return <TokenPageClient address={address} />;
+}

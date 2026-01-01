@@ -6,7 +6,6 @@ interface TokenChartProps {
 
 const TokenChart: React.FC<TokenChartProps> = ({ candles }) => {
   if (!candles || candles.length === 0) return <div>No chart data.</div>;
-  // Simple SVG line chart for closing prices
   const width = 320;
   const height = 100;
   const margin = 10;
@@ -15,7 +14,6 @@ const TokenChart: React.FC<TokenChartProps> = ({ candles }) => {
   const maxY = Math.max(...points.map(p => p.y));
   const scaleY = (y: number) => height - margin - ((y - minY) / (maxY - minY || 1)) * (height - 2 * margin);
   const scaleX = (x: number) => margin + (x / (points.length - 1 || 1)) * (width - 2 * margin);
-  const path = points.map((p, i) => `${i === 0 ? "M" : "L"}${scaleX(p.x)},${scaleY(p.y)}`).join(" ");
   return (
     <svg width={width} height={height} className="w-full h-24">
       <polyline

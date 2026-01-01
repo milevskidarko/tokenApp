@@ -7,7 +7,9 @@ const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo";
 
 export default function Web3ModalInitializer() {
   useEffect(() => {
-    createWeb3Modal({ wagmiConfig, projectId });
+    if (typeof window !== "undefined") {
+      createWeb3Modal({ wagmiConfig, projectId });
+    }
   }, []);
   return null;
 }

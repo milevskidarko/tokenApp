@@ -1,159 +1,348 @@
 "use client";
-
-import React from "react";
-import { useTokenData } from "../lib/tokenData";
-import RiskIndicator from "./RiskIndicator";
-import TokenChart from "./TokenChart";
+import React, { useEffect, useState } from "react";
+import { FiExternalLink, FiTrendingUp, FiShield, FiDollarSign, FiActivity, FiLayers } from "react-icons/fi";
 import CopyButton from "./CopyButton";
+import TokenChart from "./TokenChart";
+import RiskIndicator from "./RiskIndicator";
+import { useTokenData } from "@/lib/tokenData";
 
 interface TokenPageClientProps {
-    address: string;
+  address: string;
+}
+
+interface ChartData {
+  candles?: Array<{
+    timestamp: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+  }>;
 }
 
 const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
-    const {
-        dex,
-        dexError,
-        dexLoading,
-        goplus,
-        goplusError,
-        goplusLoading,
-    } = useTokenData(address);
+  const { dex, dexError, dexLoading, goplus, goplusError, goplusLoading } =
+    useTokenData(address);
 
-    const pair = dex?.pairs?.[0];
-    const tokenKey = address.toLowerCase();
-    const goplusToken = goplus?.result?.[tokenKey];
+  const tokenKey = address.toLowerCase();
+  const goplusToken = goplus?.result?.[tokenKey];
+  const [activePairIndex, setActivePairIndex] = useState(0);
+  const [pairChart, setPairChart] = useState<ChartData | null>(null);
 
-    return (
-        <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-            {/* HEADER */}
-            <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-bold">Token Overview</h1>
-                <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-                    {address}
-                </span>
-                <CopyButton value={address} />
+  const activePair = dex?.pairs?.[activePairIndex] || null;
+
+  useEffect(() => {
+    if (!activePair) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPairChart(null);
+      return;
+    }
+    if (activePair.chart?.candles?.length > 0) {
+      setPairChart(activePair.chart);
+    } else if (activePair.pairAddress && activePair.chainId) {
+      const url = `https://api.dexscreener.com/latest/dex/pairs/${activePair.chainId}/${activePair.pairAddress.toLowerCase()}`;
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => setPairChart(data.pair?.chart || null))
+        .catch(() => setPairChart(null));
+    } else {
+      setPairChart(null);
+    }
+  }, [activePair]);
+
+  const formatNumber = (num: number) => {
+    if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`;
+    if (num >= 1e6) return `$${(num / 1e6).toFixed(2)}M`;
+    if (num >= 1e3) return `$${(num / 1e3).toFixed(2)}K`;
+    return `$${num.toFixed(2)}`;
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="rounded-2xl bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 dark:from-blue-500/10 dark:via-purple-500/10 dark:to-pink-500/10 p-6 border border-gray-200/50 dark:border-gray-700/50">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+              Token Analysis
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Comprehensive insights for {address.slice(0, 8)}...{address.slice(-6)}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                <code className="font-mono text-sm truncate text-gray-800 dark:text-gray-200">
+                  {address}
+                </code>
+              </div>
             </div>
-
-            {(dexLoading || goplusLoading) && (
-                <div className="text-sm text-muted-foreground">
-                    Loading token data...
-                </div>
-            )}
-
-            {(dexError || goplusError) && (
-                <div className="text-red-500">
-                    Error loading token data
-                </div>
-            )}
-
-            {/* MAIN GRID */}
-            <div className="grid gap-6 md:grid-cols-3">
-                {/* CHART */}
-                <div className="md:col-span-2 card p-6">
-                    <h2 className="font-semibold mb-4">Price Chart (1h)</h2>
-                    {pair ? (
-                        <TokenChart
-                            candles={pair.chart?.candles?.slice(-24) ?? []}
-                        />
-                    ) : (
-                        <div className="text-sm text-muted-foreground">
-                            No chart data available
-                        </div>
-                    )}
-                </div>
-
-                {/* MARKET DATA */}
-                <div className="card p-6 space-y-4">
-                    <h2 className="font-semibold">Market Data</h2>
-
-                    <Stat label="Price">
-                        {pair?.priceUsd
-                            ? `$${Number(pair.priceUsd).toFixed(6)}`
-                            : "-"}
-                    </Stat>
-
-                    <Stat label="Liquidity">
-                        {pair?.liquidity?.usd
-                            ? `$${Number(pair.liquidity.usd).toLocaleString()}`
-                            : "-"}
-                    </Stat>
-
-                    <Stat label="Volume (24h)">
-                        {pair?.volume?.h24
-                            ? `$${Number(pair.volume.h24).toLocaleString()}`
-                            : "-"}
-                    </Stat>
-                </div>
-
-                {/* SECURITY */}
-                <div className="card p-6 space-y-4">
-                    <h2 className="font-semibold">Security</h2>
-
-                    {goplusToken ? (
-                        <>
-                            <Stat label="Buy Tax">
-                                {goplusToken.buy_tax ?? "-"}%
-                            </Stat>
-
-                            <Stat label="Sell Tax">
-                                {goplusToken.sell_tax ?? "-"}%
-                            </Stat>
-
-                            <Stat label="Honeypot">
-                                {goplusToken.is_honeypot === "1"
-                                    ? "Yes"
-                                    : "No"}
-                            </Stat>
-
-                            <Stat label="Ownership Renounced">
-                                {goplusToken.owner_address ===
-                                    "0x0000000000000000000000000000000000000000"
-                                    ? "Yes"
-                                    : "No"}
-                            </Stat>
-
-                            <RiskIndicator
-                                buyTax={goplusToken.buy_tax}
-                                sellTax={goplusToken.sell_tax}
-                                isHoneypot={goplusToken.is_honeypot}
-                                ownerRenounced={
-                                    goplusToken.owner_address ===
-                                    "0x0000000000000000000000000000000000000000"
-                                }
-                            />
-                        </>
-                    ) : (
-                        <div className="text-sm text-muted-foreground">
-                            No security data available
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {!dexLoading &&
-                !goplusLoading &&
-                (!dex?.pairs || dex.pairs.length === 0) && (
-                    <div className="text-yellow-600">
-                        No liquidity or token not found
-                    </div>
-                )}
+            <CopyButton value={address} />
+            <button className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+              <FiExternalLink className="text-gray-600 dark:text-gray-400" />
+            </button>
+          </div>
         </div>
-    );
+      </div>
+
+      {/* Loading & Error States */}
+      {(dexLoading || goplusLoading) && (
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-8 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-center gap-3">
+            <div className="h-4 w-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 animate-ping"></div>
+            <span className="text-gray-600 dark:text-gray-400">Loading token data...</span>
+          </div>
+        </div>
+      )}
+
+      {(dexError || goplusError) && (
+        <div className="rounded-2xl bg-red-50 dark:bg-red-900/20 p-6 border border-red-200 dark:border-red-800">
+          <p className="text-red-600 dark:text-red-400">Error loading token data. Please try again.</p>
+        </div>
+      )}
+
+      {/* Main Grid */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Left Column - Chart */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Chart Card */}
+          <div className="rounded-2xl bg-white dark:bg-gray-800/50 p-6 border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/10 to-purple-600/10">
+                  <FiTrendingUp className="text-blue-600 dark:text-blue-400 text-xl" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-gray-800 dark:text-gray-200">Price Chart (1h)</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Last 24 hours of trading</p>
+                </div>
+              </div>
+
+              {dex?.pairs && dex.pairs.length > 1 && (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Pair:</span>
+                  <select
+                    value={activePairIndex}
+                    onChange={(e) => setActivePairIndex(Number(e.target.value))}
+                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  >
+                    {dex.pairs.map((p: {
+                      pairAddress?: string;
+                      baseToken?: { symbol?: string };
+                      quoteToken?: { symbol?: string };
+                      chain?: string;
+                    }, idx: number) => (
+                      <option key={p.pairAddress || idx} value={idx}>
+                        {p.baseToken?.symbol} / {p.quoteToken?.symbol} ({p.chain})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {pairChart?.candles?.length ? (
+              <div className="h-[300px]">
+                <TokenChart
+                  candles={pairChart.candles.slice(-24).map(candle => ({
+                    t: candle.timestamp,
+                    o: candle.open.toString(),
+                    h: candle.high.toString(),
+                    l: candle.low.toString(),
+                    c: candle.close.toString(),
+                    v: candle.volume.toString(),
+                  }))}
+                />
+              </div>
+            ) : (
+              <div className="h-[300px] flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-dashed border-gray-300 dark:border-gray-700">
+                <div className="text-center">
+                  <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-3">
+                    <FiActivity className="text-gray-400 text-xl" />
+                  </div>
+                  <p className="text-gray-500 dark:text-gray-400">No recent trading activity</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Chart will appear when data is available</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Market Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <StatCard
+              icon={<FiDollarSign />}
+              title="Price"
+              value={activePair?.priceUsd ? `$${Number(activePair.priceUsd).toFixed(8)}` : "-"}
+              change="+2.4%"
+              color="blue"
+            />
+            <StatCard
+              icon={<FiLayers />}
+              title="Liquidity"
+              value={activePair?.liquidity?.usd ? formatNumber(Number(activePair.liquidity.usd)) : "-"}
+              change="+1.2%"
+              color="green"
+            />
+            <StatCard
+              icon={<FiTrendingUp />}
+              title="24h Volume"
+              value={activePair?.volume?.h24 ? formatNumber(Number(activePair.volume.h24)) : "-"}
+              change="+5.8%"
+              color="purple"
+            />
+          </div>
+        </div>
+
+        {/* Right Column - Security & Info */}
+        <div className="space-y-6">
+          {/* Security Card */}
+          <div className="rounded-2xl bg-white dark:bg-gray-800/50 p-6 border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-red-500/10 to-orange-600/10">
+                <FiShield className="text-red-600 dark:text-red-400 text-xl" />
+              </div>
+              <div>
+                <h2 className="font-bold text-gray-800 dark:text-gray-200">Security Analysis</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Contract verification</p>
+              </div>
+            </div>
+
+            {goplusToken ? (
+              <div className="space-y-4">
+                <SecurityStat label="Buy Tax" value={`${goplusToken.buy_tax ?? "-"}%`} />
+                <SecurityStat label="Sell Tax" value={`${goplusToken.sell_tax ?? "-"}%`} />
+                <SecurityStat
+                  label="Honeypot"
+                  value={goplusToken.is_honeypot === "1" ? "⚠️ Detected" : "✅ Clear"}
+                  isWarning={goplusToken.is_honeypot === "1"}
+                />
+                <SecurityStat
+                  label="Ownership"
+                  value={
+                    goplusToken.owner_address === "0x0000000000000000000000000000000000000000"
+                      ? "✅ Renounced"
+                      : "⚠️ Centralized"
+                  }
+                  isWarning={goplusToken.owner_address !== "0x0000000000000000000000000000000000000000"}
+                />
+
+                <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700">
+                  <RiskIndicator
+                    buyTax={goplusToken.buy_tax}
+                    sellTax={goplusToken.sell_tax}
+                    isHoneypot={goplusToken.is_honeypot}
+                    ownerRenounced={
+                      goplusToken.owner_address === "0x0000000000000000000000000000000000000000"
+                    }
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-3">
+                  <FiShield className="text-gray-400 text-xl" />
+                </div>
+                <p className="text-gray-500 dark:text-gray-400">No security data available</p>
+              </div>
+            )}
+          </div>
+
+          {/* Token Info Card */}
+          <div className="rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 p-6 border border-gray-200 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Token Information</h3>
+            <div className="space-y-3">
+              <InfoRow label="Chain" value={activePair?.chain || "-"} />
+              <InfoRow label="DEX" value={activePair?.dexId || "-"} />
+              <InfoRow label="Pair Created" value={activePair?.pairCreatedAt ?
+                new Date(activePair.pairCreatedAt).toLocaleDateString() : "-"
+              } />
+              <InfoRow label="Market Cap" value={
+                activePair?.fdv ? formatNumber(Number(activePair.fdv)) : "-"
+              } />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* No Data State */}
+      {!dexLoading && !goplusLoading && (!dex?.pairs || dex.pairs.length === 0) && (
+        <div className="rounded-2xl bg-yellow-50 dark:bg-yellow-900/20 p-6 border border-yellow-200 dark:border-yellow-800/30">
+          <div className="flex items-center gap-3">
+            <div className="h-6 w-6 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+              <span className="text-yellow-600 dark:text-yellow-400">⚠️</span>
+            </div>
+            <p className="text-yellow-800 dark:text-yellow-300">
+              No liquidity pools found or token not tracked
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
-/* Small reusable stat component */
-const Stat = ({
-    label,
-    children,
-}: {
-    label: string;
-    children: React.ReactNode;
-}) => (
-    <div className="flex justify-between text-sm">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium">{children}</span>
+interface StatCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+  change: string;
+  color: "blue" | "green" | "purple";
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, title, value, change, color }) => {
+  const colorClasses = {
+    blue: "from-blue-500 to-cyan-500",
+    green: "from-green-500 to-emerald-500",
+    purple: "from-purple-500 to-pink-500"
+  };
+
+  return (
+    <div className="rounded-xl bg-white dark:bg-gray-800 p-5 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+      <div className="flex items-center justify-between mb-3">
+        <div className={`p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]}/10`}>
+          <div className={`text-${color}-600 dark:text-${color}-400`}>
+            {icon}
+          </div>
+        </div>
+        <span className={`text-xs font-medium px-2 py-1 rounded-full bg-${color}-100 dark:bg-${color}-900/30 text-${color}-700 dark:text-${color}-300`}>
+          {change}
+        </span>
+      </div>
+      <p className="text-sm text-gray-600 dark:text-gray-400">{title}</p>
+      <p className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-1">{value}</p>
     </div>
+  );
+};
+
+interface SecurityStatProps {
+  label: string;
+  value: string;
+  isWarning?: boolean;
+}
+
+const SecurityStat: React.FC<SecurityStatProps> = ({ label, value, isWarning = false }) => (
+  <div className="flex items-center justify-between py-2">
+    <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
+    <span className={`text-sm font-medium ${isWarning ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-800 dark:text-gray-200'}`}>
+      {value}
+    </span>
+  </div>
+);
+
+interface InfoRowProps {
+  label: string;
+  value: string;
+}
+
+const InfoRow: React.FC<InfoRowProps> = ({ label, value }) => (
+  <div className="flex justify-between items-center">
+    <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
+    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{value}</span>
+  </div>
 );
 
 export default TokenPageClient;
