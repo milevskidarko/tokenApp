@@ -1,6 +1,5 @@
 "use client";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi";
 import { mainnet, bsc } from "wagmi/chains";
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "demo";
@@ -19,5 +18,4 @@ export const wagmiConfig = defaultWagmiConfig({
 createWeb3Modal({
   wagmiConfig,
   projectId,
-  chains: [mainnet, bsc],
 });

@@ -1,6 +1,8 @@
+// import "../w3m"; // No longer needed, initialization moved to client component
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Web3ModalInitializer from "../components/Web3ModalInitializer";
 import Header from "../components/Header";
 import Main from "../components/Main";
 import Footer from "../components/Footer";
@@ -30,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background`}
       >
+        <Web3ModalInitializer />
         <Web3ProviderClient>
           <Header />
           <Main>{children}</Main>

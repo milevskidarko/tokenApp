@@ -1,5 +1,5 @@
 "use client";
-import "../w3m";
+// import "../w3m"; // Removed to avoid duplicate initialization
 import React from "react";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
