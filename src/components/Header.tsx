@@ -1,14 +1,15 @@
-"use client";
-import dynamic from 'next/dynamic';
-
-const WalletConnectButton = dynamic(() => import('./WalletConnectButton'), { ssr: false });
+import Link from "next/link";
 
 const Header = () => (
-    <header className="w-full flex items-center justify-between px-6 py-4 border-b bg-background">
-        <div className="font-bold text-xl">Crypto Token Dashboard</div>
-        {/* <div>
-            <WalletConnectButton />
-        </div> */}
+    <header className="border-b bg-background">
+        <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
+            <Link href="/" className="font-bold text-lg">
+                TokenAnalyzer
+            </Link>
+            <div className="text-xs text-muted-foreground">
+                BSC / ETH
+            </div>
+        </div>
     </header>
 );
 

@@ -1,14 +1,13 @@
 "use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-const isValidAddress = (address: string) => {
-    // Basic Ethereum address validation
-    return /^0x[a-fA-F0-9]{40}$/.test(address);
-};
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
+const isValidAddress = (address: string) =>
+    /^0x[a-fA-F0-9]{40}$/.test(address);
 
 const TokenSearch: React.FC = () => {
-    const [address, setAddress] = useState('');
+    const [address, setAddress] = useState("");
     const [touched, setTouched] = useState(false);
     const router = useRouter();
 
@@ -20,28 +19,39 @@ const TokenSearch: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 card max-w-md mx-auto mt-8">
-            <label htmlFor="token-address" className="font-semibold">Token Address</label>
+        <form
+            onSubmit={handleSubmit}
+            className="card p-6 space-y-4 shadow-lg"
+        >
+            <label className="text-sm font-medium">
+                Token Address
+            </label>
+
             <input
-                id="token-address"
                 type="text"
-                className="border rounded px-3 py-2 font-mono"
-                placeholder="e.g. 0x..."
+                className="w-full rounded-md border px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="0x..."
                 value={address}
-                onChange={e => setAddress(e.target.value)}
+                onChange={(e) => setAddress(e.target.value)}
                 onBlur={() => setTouched(true)}
-                autoComplete="off"
             />
-            <div className="text-xs text-muted-foreground">Example: 0x0000000000000000000000000000000000000000</div>
+
+            <div className="text-xs text-muted-foreground">
+                Example: 0xEa51801b8F5B88543DdaD3D1727400c15b209D8f
+            </div>
+
             {touched && address && !isValidAddress(address) && (
-                <div className="text-xs text-red-500">Invalid address format</div>
+                <div className="text-xs text-red-500">
+                    Invalid address format
+                </div>
             )}
+
             <button
                 type="submit"
-                className="bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
                 disabled={!isValidAddress(address)}
+                className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-40"
             >
-                Search
+                Analyze Token
             </button>
         </form>
     );
