@@ -62,9 +62,9 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
       {/* Header Section */}
-      <div className="rounded-2xl bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 dark:from-blue-500/10 dark:via-purple-500/10 dark:to-pink-500/10 p-6 border border-gray-200/50 dark:border-gray-700/50">
+      <div className="rounded-2xl bg-gradient-to-r from-blue-100/80 via-purple-100/80 to-pink-100/80 dark:from-blue-900/40 dark:via-purple-900/40 dark:to-pink-900/40 p-6 border border-gray-200/50 dark:border-gray-700/50">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
@@ -113,7 +113,7 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
         {/* Left Column - Chart */}
         <div className="lg:col-span-2 space-y-6">
           {/* Chart Card */}
-          <div className="rounded-2xl bg-white dark:bg-gray-800/50 p-6 border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm shadow-lg">
+          <div className="rounded-2xl bg-white/90 dark:bg-gray-900/80 p-6 border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm shadow-lg">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/10 to-purple-600/10">
@@ -162,7 +162,7 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
                 />
               </div>
             ) : (
-              <div className="h-[300px] flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-dashed border-gray-300 dark:border-gray-700">
+              <div className="h-[300px] flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800/60 border border-dashed border-gray-300 dark:border-gray-700">
                 <div className="text-center">
                   <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-3">
                     <FiActivity className="text-gray-400 text-xl" />
@@ -203,7 +203,7 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
         {/* Right Column - Security & Info */}
         <div className="space-y-6">
           {/* Security Card */}
-          <div className="rounded-2xl bg-white dark:bg-gray-800/50 p-6 border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm shadow-lg">
+          <div className="rounded-2xl bg-white/90 dark:bg-gray-900/80 p-6 border border-gray-200 dark:border-gray-700/50 backdrop-blur-sm shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 rounded-lg bg-gradient-to-br from-red-500/10 to-orange-600/10">
                 <FiShield className="text-red-600 dark:text-red-400 text-xl" />
@@ -255,7 +255,7 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
           </div>
 
           {/* Token Info Card */}
-          <div className="rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 p-6 border border-gray-200 dark:border-gray-700">
+          <div className="rounded-2xl bg-gradient-to-br from-gray-100/80 to-white/80 dark:from-gray-900/60 dark:to-gray-800/60 p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Token Information</h3>
             <div className="space-y-3">
               <InfoRow label="Chain" value={activePair?.chain || "-"} />
@@ -273,7 +273,7 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
 
       {/* No Data State */}
       {!dexLoading && !goplusLoading && (!dex?.pairs || dex.pairs.length === 0) && (
-        <div className="rounded-2xl bg-yellow-50 dark:bg-yellow-900/20 p-6 border border-yellow-200 dark:border-yellow-800/30">
+        <div className="rounded-2xl bg-yellow-50 dark:bg-yellow-900/40 p-6 border border-yellow-200 dark:border-yellow-800/40">
           <div className="flex items-center gap-3">
             <div className="h-6 w-6 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
               <span className="text-yellow-600 dark:text-yellow-400">⚠️</span>
