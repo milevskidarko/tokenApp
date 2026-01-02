@@ -3,18 +3,18 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const isValidAddress = (address: string) =>
-    /^0x[a-fA-F0-9]{40}$/.test(address);
+const isValidTokenAddress = (tokenAddress: string) =>
+    /^0x[a-fA-F0-9]{40}$/.test(tokenAddress);
 
 const TokenSearch: React.FC = () => {
-    const [address, setAddress] = useState("");
+    const [tokenAddress, setTokenAddress] = useState("");
     const [touched, setTouched] = useState(false);
     const router = useRouter();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (isValidAddress(address)) {
-            router.push(`/token/${address}`);
+        if (isValidTokenAddress(tokenAddress)) {
+            router.push(`/token/${tokenAddress}`);
         }
     };
 
@@ -31,24 +31,24 @@ const TokenSearch: React.FC = () => {
                 type="text"
                 className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 font-mono text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="0x..."
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={tokenAddress}
+                onChange={(e) => setTokenAddress(e.target.value)}
                 onBlur={() => setTouched(true)}
             />
 
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-                Example: 0xEa51801b8F5B88543DdaD3D1727400c15b209D8f
+            <div className="text-xs text-gray-500 dark:text-gray-400 break-all max-w-full leading-tight">
+                Example: <span className="whitespace-pre-line">0xEa51801b8F5B88543DdaD3D1727400c15b209D8f</span>
             </div>
 
-            {touched && address && !isValidAddress(address) && (
+            {touched && tokenAddress && !isValidTokenAddress(tokenAddress) && (
                 <div className="text-xs text-red-500">
-                    Invalid address format
+                    Invalid token address format
                 </div>
             )}
 
             <button
                 type="submit"
-                disabled={!isValidAddress(address)}
+                disabled={!isValidTokenAddress(tokenAddress)}
                 className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-40 dark:bg-blue-700 dark:hover:bg-blue-800"
             >
                 Analyze Token

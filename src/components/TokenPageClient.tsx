@@ -10,7 +10,7 @@ import SecurityStat from "./SecurityStat";
 import StatCard from "./StatCard";
 
 interface TokenPageClientProps {
-  address: string;
+  tokenAddress: string;
 }
 
 interface ChartData {
@@ -24,17 +24,17 @@ interface ChartData {
   }>;
 }
 
-const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
+const TokenPageClient: React.FC<TokenPageClientProps> = ({ tokenAddress }) => {
   const { dex, dexError, dexLoading, goplus, goplusError, goplusLoading } =
-    useTokenData(address);
+    useTokenData(tokenAddress);
 
-  const tokenKey = address.toLowerCase();
+  const tokenKey = tokenAddress.toLowerCase();
   const goplusToken = goplus?.result?.[tokenKey];
   const [activePairIndex, setActivePairIndex] = useState(0);
   const [pairChart, setPairChart] = useState<ChartData | null>(null);
 
   const activePair = dex?.pairs?.[activePairIndex] || null;
-
+  console.log({ pairChart, activePair, dex });
   useEffect(() => {
     if (!activePair) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -71,7 +71,7 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
               Token Analysis
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Comprehensive insights for {address.slice(0, 8)}...{address.slice(-6)}
+              Comprehensive insights for {tokenAddress.slice(0, 8)}...{tokenAddress.slice(-6)}
             </p>
           </div>
 
@@ -80,11 +80,11 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
               <div className="flex items-center gap-2 p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
                 <code className="font-mono text-sm truncate text-gray-800 dark:text-gray-200">
-                  {address}
+                  {tokenAddress}
                 </code>
               </div>
             </div>
-            <CopyButton value={address} />
+            <CopyButton value={tokenAddress} />
             <button className="p-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
               <FiExternalLink className="text-gray-600 dark:text-gray-400" />
             </button>
@@ -138,11 +138,17 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ address }) => {
                       baseToken?: { symbol?: string };
                       quoteToken?: { symbol?: string };
                       chain?: string;
-                    }, idx: number) => (
-                      <option key={p.pairAddress || idx} value={idx}>
-                        {p.baseToken?.symbol} / {p.quoteToken?.symbol} ({p.chain})
-                      </option>
-                    ))}
+                    }, idx: number) => {
+                      const base = p.baseToken?.symbol || "Unknown";
+                      const quote = p.quoteToken?.symbol || "Unknown";
+                      const chain = p.chain || "-";
+                      const pairAddr = p.pairAddress ? p.pairAddress.slice(0, 6) + "..." + p.pairAddress.slice(-4) : idx;
+                      return (
+                        <option key={p.pairAddress || idx} value={idx}>
+                          {base} / {quote} ({chain}) [{pairAddr}]
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
               )}

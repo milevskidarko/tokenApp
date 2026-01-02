@@ -4,11 +4,11 @@ import TokenPageClient from "../../../components/TokenPageClient";
 
 export default function TokenPage() {
     const params = useParams();
-    const address = typeof params.address === "string" ? params.address : params.address?.[0];
+    const tokenAddress = typeof params.tokenAddress === "string" ? params.tokenAddress : params.tokenAddress?.[0];
 
-    if (!address) {
+    if (!tokenAddress) {
         return <div>Invalid token address.</div>;
     }
 
-    return <TokenPageClient address={address} />;
+    return <TokenPageClient tokenAddress={tokenAddress} />;
 }
