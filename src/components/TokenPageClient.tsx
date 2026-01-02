@@ -32,9 +32,7 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ tokenAddress }) => {
   const goplusToken = goplus?.result?.[tokenKey];
   const [activePairIndex, setActivePairIndex] = useState(0);
   const [pairChart, setPairChart] = useState<ChartData | null>(null);
-
   const activePair = dex?.pairs?.[activePairIndex] || null;
-  console.log({ pairChart, activePair, dex });
   useEffect(() => {
     if (!activePair) {
       // eslint-disable-next-line react-hooks/set-state-in-effect

@@ -31,6 +31,7 @@ export function useTokenData(tokenAddress: string) {
   } = useSWR(tokenAddress ? ["goplus", tokenAddress] : null, () =>
     fetchGoPlus(tokenAddress)
   );
+
   return {
     dex,
     dexError,
