@@ -34,13 +34,21 @@ export default function Home() {
               Try these example addresses:
             </p>
             <div className="flex flex-wrap gap-2">
-              {["0x...BUSD", "0x...USDT", "0x...ETH"].map((example, idx) => (
+              {/* Example buttons now use a custom event to update TokenSearch state */}
+              {[
+                { label: "BUSD", address: "0xe9e7cea3dedca5984780bafc599bd69add087d56" },
+                { label: "USDT", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7" },
+                { label: "WETH", address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" }
+              ].map((example, idx) => (
                 <button
                   key={idx}
-                  className="px-3 py-1.5 text-xs rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  onClick={() => {/* Add example handler */ }}
+                  className="px-3 py-1.5 text-xs rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-mono"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('fillTokenAddress', { detail: example.address }));
+                  }}
+                  title={example.label}
                 >
-                  {example}
+                  {example.address.slice(0, 8)}...{example.address.slice(-6)}
                 </button>
               ))}
             </div>

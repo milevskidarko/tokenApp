@@ -124,12 +124,12 @@ const TokenPageClient: React.FC<TokenPageClientProps> = ({ tokenAddress }) => {
               </div>
 
               {dex?.pairs && dex.pairs.length > 1 && (
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Pair:</span>
                   <select
                     value={activePairIndex}
                     onChange={(e) => setActivePairIndex(Number(e.target.value))}
-                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="w-full sm:w-auto px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   >
                     {dex.pairs.map((p: {
                       pairAddress?: string;

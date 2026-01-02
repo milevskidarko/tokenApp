@@ -1,15 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const isValidTokenAddress = (tokenAddress: string) =>
     /^0x[a-fA-F0-9]{40}$/.test(tokenAddress);
 
+
 const TokenSearch: React.FC = () => {
     const [tokenAddress, setTokenAddress] = useState("");
     const [touched, setTouched] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        const handler = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            setTokenAddress(customEvent.detail);
+            setTouched(true);
+        };
+        window.addEventListener('fillTokenAddress', handler);
+        return () => window.removeEventListener('fillTokenAddress', handler);
+    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
